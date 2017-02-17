@@ -4,11 +4,12 @@
 %table#movies
   %thead
     %tr
-      %th{:class => ("hilite" if params["title"]), :id =>("title_header")}= link_to"Movie Title", root_path(title:true)
+      %th <a href="#" id="title_header">Movie td</a>
       %th Rating
-      %th{:class => ("hilite" if params["release"]), :id =>("release_date_header")}= link_to"Release Date", root_path(release:true)
+      %th Release Date
       %th More Info
   %tbody
+    -# @movies = @movies.order("title")
     - @movies.each do |movie|
       %tr
         %td= movie.title 
