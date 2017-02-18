@@ -14,11 +14,6 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.get_ratings	
 	ratings_checked = ['G','PG','PG-13','R']
 	
-	if session[:movies]
-	  @movies = session[:movies]
-	else
-	  @movies = Movie.all
-	end
 	
 	if params["ratings"]
 	  ratings_checked = []
@@ -32,9 +27,15 @@ class MoviesController < ApplicationController
 	  session[:ratings_checked] = ratings_checked
 	else
 	  @movies = Movie.none
-	  ratings_checked = session[:ratings_checked]
-	  for k in ratings_checked
-	    @movies += Movie.where("rating = ?", k)
+	  
+	  begin
+	    ratings_checked = session[:ratings_checked]
+	    for k in ratings_checked
+	      @movies += Movie.where("rating = ?", k)
+	    end
+	  rescue
+	    ratings_checked = ['G','PG','PG-13','R']
+		@movies = Movie.all
 	  end
 	end
 
