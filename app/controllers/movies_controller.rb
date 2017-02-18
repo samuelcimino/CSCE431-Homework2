@@ -11,17 +11,35 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if params["title"]
-	  @movies = Movie.all.order("title")
-	elsif params["release"]
-	  @movies = Movie.all.order("release_date")
+    @all_ratings = Movie.get_ratings
+	ratings_checked = []
+	
+	
+	if params["ratings"]
+	  @movies = Movie.none
+	  keys = params["ratings"].keys
+	
+	  for k in keys
+		@movies += Movie.where("rating = ?", k)
+		ratings_checked.push(k)
+      end
 	else
 	  @movies = Movie.all
+	  ratings_checked = ['G','PG','PG-13','R']
 	end
-  
-  
-    
-	#@movies_sorted_d = Movie.all.order("description")
+	
+	
+	
+	#@movies = Movie.all
+    if params["title"]
+	  @movies = @movies.order("title")
+	elsif params["release"]
+	  @movies = @movies.order("release_date")
+	#else
+	#  @movies = Movie.all
+	end
+
+    @ratings_checked = ratings_checked
   end
 
   def new
