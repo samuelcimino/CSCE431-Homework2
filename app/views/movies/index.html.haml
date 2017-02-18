@@ -12,9 +12,9 @@
 %table#movies
   %thead
     %tr
-      %th{:class => ("hilite" if params["title"]), :id =>("title_header")}= link_to"Movie Title", root_path(title:true)
+      %th{:class => ("hilite" if params["title"] or session["title"]), :id =>("title_header")}= link_to"Movie Title", root_path(title:true)
       %th Rating
-      %th{:class => ("hilite" if params["release"]), :id =>("release_date_header")}= link_to"Release Date", root_path(release:true)
+      %th{:class => ("hilite" if params["release"] or session["release"]), :id =>("release_date_header")}= link_to"Release Date", root_path(release:true)
       %th More Info
   %tbody
     - @movies.each do |movie|

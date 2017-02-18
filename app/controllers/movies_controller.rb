@@ -11,11 +11,17 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.get_ratings
-	ratings_checked = []
+    @all_ratings = Movie.get_ratings	
+	ratings_checked = ['G','PG','PG-13','R']
 	
+	if session[:movies]
+	  @movies = session[:movies]
+	else
+	  @movies = Movie.all
+	end
 	
 	if params["ratings"]
+	  ratings_checked = []
 	  @movies = Movie.none
 	  keys = params["ratings"].keys
 	
@@ -23,22 +29,67 @@ class MoviesController < ApplicationController
 		@movies += Movie.where("rating = ?", k)
 		ratings_checked.push(k)
       end
+	  session[:ratings_checked] = ratings_checked
 	else
-	  @movies = Movie.all
-	  ratings_checked = ['G','PG','PG-13','R']
-	end
-	
-	
-	
-	#@movies = Movie.all
-    if params["title"]
-	  @movies = @movies.order("title")
-	elsif params["release"]
-	  @movies = @movies.order("release_date")
-	#else
-	#  @movies = Movie.all
+	  @movies = Movie.none
+	  ratings_checked = session[:ratings_checked]
+	  for k in ratings_checked
+	    @movies += Movie.where("rating = ?", k)
+	  end
 	end
 
+    if params["title"]
+	  begin
+	    @movies = @movies.order("title")
+	    session["title"] = true
+	    session["release"] = false
+	  rescue
+	    @movies = @movies.sort_by do |item|
+		  item[:title]
+		end
+		session["title"] = true
+	    session["release"] = false
+	  end
+	  
+	elsif params["release"]
+	  begin
+	    @movies = @movies.order("release_date")
+	    session["title"] = false
+	    session["release"] = true
+	  rescue
+	    @movies = @movies.sort_by do |item|
+		  item[:release_date]
+		end
+		session["title"] = false
+	    session["release"] = true
+	  end
+	  
+	elsif session["title"]
+	  begin
+	    @movies = @movies.order("title")
+	    session["title"] = true
+	    session["release"] = false
+	  rescue
+	    @movies = @movies.sort_by do |item|
+		  item[:title]
+		end
+		session["title"] = true
+	    session["release"] = false
+	  end
+	  
+	elsif session["release"]
+	  begin
+	    @movies = @movies.order("release_date")
+	    session["title"] = false
+	    session["release"] = true
+	  rescue
+	    @movies = @movies.sort_by do |item|
+		  item[:release_date]
+		end
+		session["title"] = false
+	    session["release"] = true
+	  end
+	end
     @ratings_checked = ratings_checked
   end
 
